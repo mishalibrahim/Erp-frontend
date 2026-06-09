@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import {
@@ -7,12 +8,13 @@ import {
 } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Button } from "@/components/ui/button";
-import { LogOut, Sun, Moon } from "lucide-react";
-import { useTheme } from "@/features/theme/contexts/ThemeProvider";
+import { LogOut } from "lucide-react";
+import { ThemeToggle } from "@/features/theme/components/ThemeToggle";
+import { LogoutDialog } from "@/features/auth/components/LogoutDialog";
 
 export const ProtectedLayout = () => {
-  const { isAuthenticated, isLoading, user, logout } = useAuth();
-  const { theme, setTheme } = useTheme();
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const [logoutOpen, setLogoutOpen] = useState(false);
 
   if (isLoading) {
     return <div style={{ padding: "2rem" }}>Loading Aegis ERP...</div>;
@@ -29,18 +31,17 @@ export const ProtectedLayout = () => {
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
           <SidebarTrigger className="-ml-1" />
-          <div className="ml-auto flex items-center space-x-2 text-sm">
-            <span className="mr-2">Welcome, {user?.email || "Admin"}</span>
+          <div className="ml-auto flex items-center space-x-4 text-sm">
+            <span className="mr-2 hidden sm:inline-block">
+              Welcome, {user?.email || "Admin"}
+            </span>
+            <ThemeToggle />
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+              onClick={() => setLogoutOpen(true)}
+              title="Log out"
             >
-              <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              <span className="sr-only">Toggle theme</span>
-            </Button>
-            <Button variant="ghost" size="icon" onClick={logout} title="Log out">
               <LogOut className="h-[1.2rem] w-[1.2rem]" />
               <span className="sr-only">Log out</span>
             </Button>
@@ -50,6 +51,9 @@ export const ProtectedLayout = () => {
           <Outlet />
         </main>
       </SidebarInset>
+
+      <LogoutDialog open={logoutOpen} onOpenChange={setLogoutOpen} />
     </SidebarProvider>
   );
 };
+

@@ -1,8 +1,14 @@
-import { Link } from "react-router-dom";
-import { LayoutDashboard, Settings } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import {
+  LayoutDashboard,
+  Settings,
+  ChevronRight,
+  BookOpen,
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -10,7 +16,16 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import { TenantSwitcher } from "@/features/auth/components/TenantSwitcher";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const navGroups = [
   {
@@ -24,11 +39,36 @@ const navGroups = [
     ],
   },
   {
+    label: "Accounting",
+    items: [
+      {
+        title: "General Ledger",
+        url: "#",
+        icon: BookOpen,
+        isActive: false,
+        items: [
+          {
+            title: "Chart of Accounts",
+            url: "/accounting/coa",
+          },
+          {
+            title: "General Ledger",
+            url: "/accounting/gl",
+          },
+          {
+            title: "Journal Voucher",
+            url: "/accounting/jv",
+          },
+        ],
+      },
+    ],
+  },
+  {
     label: "Settings",
     items: [
       {
         title: "Company Setup",
-        url: "/company/setup",
+        url: "/settings/company",
         icon: Settings,
       },
     ],
@@ -36,6 +76,9 @@ const navGroups = [
 ];
 
 export function AppSidebar() {
+  const location = useLocation();
+  const pathname = location.pathname;
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -43,7 +86,6 @@ export function AppSidebar() {
           <h3 className="text-lg font-semibold tracking-tight truncate group-data-[collapsible=icon]:hidden">
             Aegis ERP
           </h3>
-          {/* You can add a compact logo here that shows when collapsed */}
           <div className="hidden group-data-[collapsible=icon]:flex font-bold">
             AE
           </div>
@@ -55,21 +97,83 @@ export function AppSidebar() {
             <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {group.items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild tooltip={item.title}>
-                      <Link to={item.url}>
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                {group.items.map((item) => {
+                  if (item.items) {
+                    const isAnySubActive = item.items.some(
+                      (sub) =>
+                        pathname === sub.url ||
+                        pathname.startsWith(sub.url + "/"),
+                    );
+
+                    return (
+                      <Collapsible
+                        key={item.title}
+                        asChild
+                        defaultOpen={item.isActive || isAnySubActive}
+                        className="group/collapsible"
+                      >
+                        <SidebarMenuItem>
+                          <CollapsibleTrigger asChild>
+                            <SidebarMenuButton
+                              tooltip={item.title}
+                              isActive={isAnySubActive}
+                            >
+                              <item.icon />
+                              <span>{item.title}</span>
+                              <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                            </SidebarMenuButton>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <SidebarMenuSub>
+                              {item.items.map((subItem) => (
+                                <SidebarMenuSubItem key={subItem.title}>
+                                  <SidebarMenuSubButton
+                                    asChild
+                                    isActive={
+                                      pathname === subItem.url ||
+                                      pathname.startsWith(subItem.url + "/")
+                                    }
+                                  >
+                                    <Link to={subItem.url}>
+                                      <span>{subItem.title}</span>
+                                    </Link>
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                              ))}
+                            </SidebarMenuSub>
+                          </CollapsibleContent>
+                        </SidebarMenuItem>
+                      </Collapsible>
+                    );
+                  }
+
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        asChild
+                        tooltip={item.title}
+                        isActive={
+                          pathname === item.url ||
+                          (item.url !== "/" &&
+                            pathname.startsWith(item.url + "/"))
+                        }
+                      >
+                        <Link to={item.url}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
         ))}
       </SidebarContent>
+      <SidebarFooter className="border-t border-sidebar-border">
+        <TenantSwitcher />
+      </SidebarFooter>
     </Sidebar>
   );
 }

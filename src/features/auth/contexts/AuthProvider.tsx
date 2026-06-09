@@ -1,6 +1,8 @@
 import { createContext, useEffect, useState, type ReactNode } from "react";
 import type { User } from "@/features/auth/types/auth";
+import { DUMMY_TENANTS, type Tenant } from "@/features/auth/types/tenant";
 import { login as loginApi, getMe as getMeApi } from "@/features/auth/api/auth";
+import { GlobalSpinner } from "@/components/shared/GlobalSpinner";
 
 interface AuthContextType {
   user: User | null;
@@ -8,12 +10,19 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  // Tenant
+  tenants: Tenant[];
+  activeTenant: Tenant;
+  setActiveTenant: (tenant: Tenant) => void;
 }
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Tenant state — will be replaced by auth API payload in the future
+  const [activeTenant, setActiveTenant] = useState<Tenant>(DUMMY_TENANTS[0]);
 
   //check for token
   useEffect(() => {
@@ -55,9 +64,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated: !!user, isLoading, login, logout }}
+      value={{
+        user,
+        isAuthenticated: !!user,
+        isLoading,
+        login,
+        logout,
+        tenants: DUMMY_TENANTS,
+        activeTenant,
+        setActiveTenant,
+      }}
     >
-      {children}
+      {isLoading ? <GlobalSpinner /> : children}
     </AuthContext.Provider>
   );
 };

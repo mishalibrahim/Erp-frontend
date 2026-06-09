@@ -20,10 +20,7 @@ export const LoginForm = () => {
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+    defaultValues: { email: "", password: "" },
   });
 
   const { isSubmitting } = form.formState;
@@ -31,48 +28,64 @@ export const LoginForm = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await login(data.email, data.password);
-      toast.success("Successfully logged in!");
+      toast.success("Welcome back! You are now signed in.");
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Invalid email or password");
+      toast.error(err.response?.data?.message || "Invalid email or password. Please try again.");
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full max-w-[420px] mx-auto z-10">
-      <div className="relative bg-card text-card-foreground rounded-3xl p-10 w-full shadow-xl border border-border">
-        <div className="text-center mb-8 relative z-10">
-          <h2 className="m-0 text-[28px] font-bold tracking-tight">Welcome back</h2>
-          <p className="mt-2 text-sm text-muted-foreground">Sign in to your account</p>
-        </div>
+    <div className="w-full">
+      {/* Heading */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold tracking-tight text-foreground">
+          Sign in to your account
+        </h2>
+        <p className="mt-1.5 text-sm text-muted-foreground">
+          Enter your credentials to access the dashboard.
+        </p>
+      </div>
 
-        <Form methods={form} onSubmit={onSubmit} className="flex flex-col gap-5 relative z-10">
-          <FormInput
-            name="email"
-            label="Email"
-            type="email"
-            placeholder="admin@aegis-erp.com"
-          />
+      <Form methods={form} onSubmit={onSubmit} className="flex flex-col gap-5">
+        <FormInput
+          name="email"
+          label="Work email"
+          type="email"
+          placeholder="you@company.com"
+          autoComplete="email"
+        />
 
+        <div>
           <FormInput
             name="password"
             label="Password"
             type="password"
             placeholder="••••••••"
+            autoComplete="current-password"
           />
+          <div className="mt-2 text-right">
+            <a
+              href="#"
+              className="text-xs text-primary hover:underline underline-offset-4"
+            >
+              Forgot password?
+            </a>
+          </div>
+        </div>
 
-          <Button
-            type="submit"
-            className="mt-2 px-6 py-6 rounded-xl font-semibold text-base transition-all duration-300 shadow-md hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              "Sign In"
-            )}
-          </Button>
-        </Form>
-      </div>
+        <Button
+          type="submit"
+          className="mt-1 h-11 w-full rounded-lg font-semibold text-sm tracking-wide transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-px active:translate-y-0"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            "Sign in →"
+          )}
+        </Button>
+      </Form>
     </div>
   );
 };
+
