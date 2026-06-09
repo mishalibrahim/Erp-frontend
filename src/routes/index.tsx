@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import { ProtectedLayout, PublicLayout } from "../layouts";
+import { Login } from "@/features/auth/routes";
 
 export const router = createBrowserRouter([
   {
@@ -7,7 +8,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/login",
-        element: <div>hello</div>,
+        element: <Login />,
       },
     ],
   },

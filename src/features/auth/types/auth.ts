@@ -11,3 +11,15 @@ export interface AuthResponse {
   role: string;
   tenantId: string;
 }
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface MeResponse {
+  userId: string;
+  isSuperAdmin: boolean;
+  tenantId: string;
+}
+
