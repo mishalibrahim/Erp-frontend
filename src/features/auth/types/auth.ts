@@ -1,5 +1,7 @@
 export interface User {
-  userId: string;
+  id: string;
+  firstName: string;
+  lastName: string;
   email: string;
   role: string;
   tenantId: string;
@@ -18,8 +20,11 @@ export interface LoginCredentials {
 }
 
 export interface MeResponse {
-  userId: string;
-  isSuperAdmin: boolean;
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
   tenantId: string;
 }
 

@@ -32,6 +32,13 @@
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
   --color-sidebar-ring: var(--sidebar-ring);
 
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
@@ -76,6 +83,14 @@
     --border: #d1d5e0;
     --input: #d1d5e0;
     --ring: #4338ca;
+
+    /* Semantic Variants */
+    --success: #16a34a;
+    --success-foreground: #ffffff;
+    --warning: #d97706;
+    --warning-foreground: #ffffff;
+    --info: #2563eb;
+    --info-foreground: #ffffff;
 
     --radius: 0.5rem;
 
@@ -128,6 +143,14 @@
     --border: #2d3148;
     --input: #252836;
     --ring: #6366f1;
+
+    /* Semantic Variants */
+    --success: #22c55e;
+    --success-foreground: #ffffff;
+    --warning: #f59e0b;
+    --warning-foreground: #ffffff;
+    --info: #3b82f6;
+    --info-foreground: #ffffff;
 
     /* Sidebar */
     --sidebar: #13151f;

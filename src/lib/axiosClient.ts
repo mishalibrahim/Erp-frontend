@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "sonner";
 
 export const axiosClient = axios.create({
   baseURL: "https://localhost:7242",
@@ -16,6 +17,22 @@ axiosClient.interceptors.request.use(
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  },
+);
+
+axiosClient.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    if (error.response && error.response.status === 401) {
+      toast.error("Session Expired", {
+        description:
+          "Your session has expired or is invalid. Please log in again.",
+        id: "session-expired",
+      });
+    }
     return Promise.reject(error);
   },
 );

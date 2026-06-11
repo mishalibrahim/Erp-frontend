@@ -33,9 +33,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           // Verify the token by calling the secure /me endpoint we built
           const data = await getMeApi();
           setUser({
-            userId: data.userId,
-            email: "admin@aegis-erp.com", // In a real app, the API should return this
-            role: data.isSuperAdmin ? "SuperAdmin" : "User",
+            id: data.id,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            role: data.role,
             tenantId: data.tenantId,
           });
         } catch (error) {
@@ -56,7 +58,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem("jwt_token", token);
 
     // Update global React state
-    setUser({ userId: "extracted_from_token", email, role, tenantId });
+    setUser({
+      id: "extracted_from_token",
+      firstName: "",
+      lastName: "",
+      email,
+      role,
+      tenantId,
+    });
   };
   const logout = () => {
     localStorage.removeItem("jwt_token");
