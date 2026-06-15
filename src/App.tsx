@@ -12,9 +12,9 @@ function App() {
       <AuthProvider>
         <TooltipProvider>
           <RouterProvider router={router} />
+          <Toaster />
         </TooltipProvider>
       </AuthProvider>
-      <Toaster />
     </ThemeProvider>
   );
 }

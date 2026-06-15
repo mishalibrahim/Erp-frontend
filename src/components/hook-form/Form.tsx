@@ -13,12 +13,12 @@ interface FormProps<T extends FieldValues> {
   className?: string;
 }
 
-export const Form = <T extends FieldValues>({
+export function Form<T extends FieldValues>({
   methods,
   onSubmit,
   children,
   className,
-}: FormProps<T>) => {
+}: FormProps<T>) {
   return (
     <RHFProvider {...methods}>
       <form onSubmit={onSubmit ? methods.handleSubmit(onSubmit) : undefined} className={className}>
@@ -26,4 +26,4 @@ export const Form = <T extends FieldValues>({
       </form>
     </RHFProvider>
   );
-};
+}

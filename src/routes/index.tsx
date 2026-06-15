@@ -3,6 +3,7 @@ import { ProtectedLayout, PublicLayout } from "../layouts";
 import { Login } from "@/features/auth/routes";
 import { ErrorBoundary } from "@/features/error/components/ErrorBoundary";
 import { FinanceDashboard } from "@/features/dashboard/components/FinanceDashboard";
+import { CompanySetupPage } from "@/features/company-setup/components/CompanySetupPage";
 
 export const router = createBrowserRouter([
   {
@@ -25,7 +26,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/settings/company",
-        element: <div></div>,
+        element: <CompanySetupPage />,
       },
     ],
   },

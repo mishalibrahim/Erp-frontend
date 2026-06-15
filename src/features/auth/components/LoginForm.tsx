@@ -29,8 +29,9 @@ export const LoginForm = () => {
     try {
       await login(data.email, data.password);
       toast.success("Welcome back! You are now signed in.");
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || "Invalid email or password. Please try again.");
+    } catch (err: unknown) {
+        const error = err as { response?: { data?: { message?: string } } };
+        toast.error(error.response?.data?.message || "Invalid email or password. Please try again.");
     }
   };
 
