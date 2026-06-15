@@ -68,7 +68,7 @@ const navGroups = [
     items: [
       {
         title: "Company Setup",
-        url: "/settings/company",
+        url: "/settings/company-setup",
         icon: Settings,
       },
     ],

@@ -1,11 +1,7 @@
 import { useFormContext, Controller } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import {
-  Field,
-  FieldLabel,
-  FieldContent,
-  FieldError,
-} from "@/components/ui/field";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   name: string;
@@ -20,31 +16,30 @@ export const FormInput = ({ name, label, className, ...props }: FormInputProps) 
       name={name}
       control={control}
       render={({ field, fieldState: { error } }) => (
-        <Field className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1.5">
           {label && (
-            <FieldLabel
+            <Label
               htmlFor={name}
-              className={`ml-1 ${error ? "text-destructive" : ""}`}
+              className={cn("text-sm font-medium", error && "text-destructive")}
             >
               {label}
-            </FieldLabel>
+            </Label>
           )}
-          <FieldContent className="relative flex items-center">
-            <Input
-              id={name}
-              className={`w-full px-4 py-3.5 rounded-xl ${
-                error ? "border-destructive focus-visible:ring-destructive" : ""
-              } ${className || ""}`}
-              {...field}
-              {...props}
-            />
-          </FieldContent>
+          <Input
+            id={name}
+            className={cn(
+              "h-10 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-sm transition-colors",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-transparent",
+              error && "border-destructive focus-visible:ring-destructive",
+              className
+            )}
+            {...field}
+            {...props}
+          />
           {error && (
-            <FieldError className="text-destructive text-xs mt-1 ml-1">
-              {error.message}
-            </FieldError>
+            <p className="text-xs text-destructive mt-0.5">{error.message}</p>
           )}
-        </Field>
+        </div>
       )}
     />
   );
