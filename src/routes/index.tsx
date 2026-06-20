@@ -3,6 +3,7 @@ import { ProtectedLayout, PublicLayout } from "../layouts";
 import { Login } from "@/features/auth/routes";
 import { ErrorBoundary } from "@/features/error/components/ErrorBoundary";
 import { FinanceDashboard } from "@/features/dashboard/components/FinanceDashboard";
+import { ChartOfAccountsPage } from "@/features/chart-of-accounts/components/ChartOfAccountsPage";
 
 import { TenantListPage } from "@/features/company-setup/components/TenantListPage";
 import { CompanySetupWizard } from "@/features/company-setup/components/CompanySetupWizard";
@@ -32,6 +33,11 @@ export const router = createBrowserRouter([
       {
         path: "/",
         element: <FinanceDashboard />,
+      },
+      // ── Chart of Accounts ────────────────────────────────────────────────
+      {
+        path: "/accounting/coa",
+        element: <ChartOfAccountsPage />,
       },
       // ── Company Setup: List Page ────────────────────────────────────────
       {
