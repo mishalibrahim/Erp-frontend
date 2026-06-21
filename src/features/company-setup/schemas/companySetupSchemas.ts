@@ -128,9 +128,13 @@ export const step7Schema = z.object({
 export const step8Schema = z.object({
   userTenantAccess: z.array(z.object({
     id: z.string().optional(),
+    firstName: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
     email: z.string().email("Invalid email address"),
     role: z.string().min(1, "Role is required"),
-    password: z.string().min(8, "Password must be at least 8 characters").optional(),
+    password: z.string().optional().refine(val => !val || val.length >= 8, {
+      message: "Password must be at least 8 characters",
+    }),
   })).optional(),
 });
 

@@ -84,7 +84,7 @@ export const Step8UsersRoles = () => {
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => append({ email: "", role: "User", password: "" })}
+              onClick={() => append({ firstName: "", lastName: "", email: "", role: "User", password: "" })}
               className="gap-1.5 h-8 text-xs"
             >
               <Plus className="w-3.5 h-3.5" /> Add User
@@ -115,20 +115,31 @@ export const Step8UsersRoles = () => {
                   </Button>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-3 mr-10">
-                  <div className="md:col-span-5">
-                    <FormInput name={`userTenantAccess.${index}.email`} label="User Email *" placeholder="user@company.com" />
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-3 mr-10 mb-3">
+                  <div className="md:col-span-4">
+                    <FormInput name={`userTenantAccess.${index}.firstName`} label="First Name *" placeholder="e.g. John" />
                   </div>
                   <div className="md:col-span-4">
+                    <FormInput name={`userTenantAccess.${index}.lastName`} label="Last Name *" placeholder="e.g. Doe" />
+                  </div>
+                  <div className="md:col-span-4">
+                    <FormInput name={`userTenantAccess.${index}.email`} label="User Email *" placeholder="user@company.com" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-3 mr-10">
+                  <div className="md:col-span-6">
                     <FormInput 
                       name={`userTenantAccess.${index}.password`} 
-                      label="Initial Password" 
+                      label="Password" 
                       type="password" 
-                      placeholder="Min 8 characters" 
+                      placeholder={methods.getValues(`userTenantAccess.${index}.id`) ? "(Password Set)" : "Min 8 characters"} 
                     />
-                    <p className="text-[10px] text-muted-foreground mt-1">If the user already exists, the password field will be ignored.</p>
+                    <p className="text-[10px] text-muted-foreground mt-1">
+                      {methods.getValues(`userTenantAccess.${index}.id`) ? "Leave blank to keep current password." : "Required for new users."}
+                    </p>
                   </div>
-                  <div className="md:col-span-3">
+                  <div className="md:col-span-6">
                     <FormSelect
                       name={`userTenantAccess.${index}.role`}
                       label="Role *"

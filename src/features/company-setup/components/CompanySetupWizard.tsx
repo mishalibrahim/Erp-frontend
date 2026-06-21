@@ -196,44 +196,46 @@ export const CompanySetupWizard = () => {
   const [rowVersion, setRowVersion] = useState<string>("");
   const [isFetchingData, setIsFetchingData] = useState(false);
 
+  const fetchDraftData = async () => {
+    if (!draftId) return;
+    setIsFetchingData(true);
+    try {
+      const data = await companySetupApi.getById(draftId);
+      
+      const stripNulls = (obj: any): any => {
+        if (obj === null) return undefined;
+        if (Array.isArray(obj)) return obj.map(stripNulls).filter((v) => v !== undefined);
+        if (typeof obj === 'object' && obj !== null) {
+          const newObj: any = {};
+          for (const key in obj) {
+            const val = stripNulls(obj[key]);
+            if (val !== undefined) {
+              newObj[key] = val;
+            }
+          }
+          return newObj;
+        }
+        return obj;
+      };
+
+      const cleanedData = stripNulls(data);
+      setDraftData(cleanedData);
+      setRowVersion(data.rowVersion || "");
+    } catch (error) {
+      toast.error("Failed to load company setup draft.");
+    } finally {
+      setIsFetchingData(false);
+    }
+  };
+
   useEffect(() => {
     if (draftId) {
-      const fetchDraftData = async () => {
-        setIsFetchingData(true);
-        try {
-          const data = await companySetupApi.getById(draftId);
-          
-          const stripNulls = (obj: any): any => {
-            if (obj === null) return undefined;
-            if (Array.isArray(obj)) return obj.map(stripNulls).filter((v) => v !== undefined);
-            if (typeof obj === 'object' && obj !== null) {
-              const newObj: any = {};
-              for (const key in obj) {
-                const val = stripNulls(obj[key]);
-                if (val !== undefined) {
-                  newObj[key] = val;
-                }
-              }
-              return newObj;
-            }
-            return obj;
-          };
-
-          const cleanedData = stripNulls(data);
-          setDraftData(cleanedData);
-          setRowVersion(data.rowVersion || "");
-        } catch (error) {
-          toast.error("Failed to load company setup draft.");
-        } finally {
-          setIsFetchingData(false);
-        }
-      };
       fetchDraftData();
     } else {
       setDraftData({});
       setRowVersion("");
     }
-  }, [draftId]);
+  }, [draftId, location.pathname]);
 
   const currentStepId = location.pathname.split("/").pop();
   const rawIndex = STEPS.findIndex((s) => s.id === currentStepId);

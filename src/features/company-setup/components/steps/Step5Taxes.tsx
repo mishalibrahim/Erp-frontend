@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   useNavigate,
   useSearchParams,
@@ -31,46 +31,51 @@ export const Step5Taxes = () => {
     useOutletContext<CompanySetupContextType>();
   const [isLoading, setIsLoading] = useState(false);
 
+  const defaultFormValues = useMemo(() => {
+    const legacyData = draftData as any;
+    const taxesData: any = draftData ? {
+      ...draftData.vatDetails,
+      ...draftData.corporateTax,
+      ...draftData,
+      defaultVatRateId: draftData.defaultVatRateId || legacyData?.taxConfiguration?.defaultVatRateId || null,
+      inputVatAccountId: draftData.inputVatAccountId || legacyData?.taxConfiguration?.inputVatAccountId || "",
+      outputVatAccountId: draftData.outputVatAccountId || legacyData?.taxConfiguration?.outputVatAccountId || "",
+      taxGroups: draftData.taxGroups || [],
+    } : {};
+
+    return {
+      vatRegistered: taxesData.vatRegistered ?? false,
+      trnLabel: taxesData.trnLabel || "TRN",
+      trnNumber: taxesData.trnNumber || "",
+      vatScheme: taxesData.vatScheme || "Standard",
+      filingFrequency: taxesData.filingFrequency || "Quarterly",
+      vatRegistrationDate: taxesData.vatRegistrationDate || "",
+      firstVatPeriod: taxesData.firstVatPeriod || "",
+      vatReturnStartPeriod: taxesData.vatReturnStartPeriod || "",
+      vatDeregistrationDate: taxesData.vatDeregistrationDate || "",
+      ctRegistered: taxesData.ctRegistered ?? false,
+      corporateTaxTrn: taxesData.corporateTaxTrn || "",
+      firstTaxPeriodStart: taxesData.firstTaxPeriodStart || "",
+      freeZonePerson: taxesData.freeZonePerson ?? false,
+      qfzpStatus: taxesData.qfzpStatus ?? false,
+      smallBusinessRelief: taxesData.smallBusinessRelief ?? false,
+      defaultVatRateId: taxesData.defaultVatRateId || null,
+      inputVatAccountId: taxesData.inputVatAccountId || "",
+      outputVatAccountId: taxesData.outputVatAccountId || "",
+      taxGroups: taxesData.taxGroups || [],
+    };
+  }, [draftData]);
+
   const methods = useForm<Step5FormData>({
     resolver: zodResolver(step5Schema) as Resolver<Step5FormData>,
-    defaultValues: {
-      vatRegistered: false,
-      trnLabel: "TRN",
-      trnNumber: "",
-      vatScheme: "Standard",
-      filingFrequency: "Quarterly",
-      vatRegistrationDate: "",
-      firstVatPeriod: "",
-      vatReturnStartPeriod: "",
-      vatDeregistrationDate: "",
-      ctRegistered: false,
-      corporateTaxTrn: "",
-      firstTaxPeriodStart: "",
-      freeZonePerson: false,
-      qfzpStatus: false,
-      smallBusinessRelief: false,
-      defaultVatRateId: null,
-      inputVatAccountId: "",
-      outputVatAccountId: "",
-      taxGroups: [],
-    },
+    defaultValues: defaultFormValues,
   });
 
   useEffect(() => {
     if (draftData) {
-      const legacyData = draftData as any;
-      const taxesData = {
-        ...draftData.vatDetails,
-        ...draftData.corporateTax,
-        ...draftData,
-        defaultVatRateId: draftData.defaultVatRateId || legacyData.taxConfiguration?.defaultVatRateId || null,
-        inputVatAccountId: draftData.inputVatAccountId || legacyData.taxConfiguration?.inputVatAccountId || "",
-        outputVatAccountId: draftData.outputVatAccountId || legacyData.taxConfiguration?.outputVatAccountId || "",
-        taxGroups: draftData.taxGroups || [],
-      };
-      methods.reset({ ...methods.getValues(), ...taxesData });
+      methods.reset(defaultFormValues);
     }
-  }, [draftData, methods]);
+  }, [defaultFormValues, methods]);
 
   const vatRegistered = methods.watch("vatRegistered");
   const ctRegistered = methods.watch("ctRegistered");

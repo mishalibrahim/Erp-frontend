@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams, useOutletContext } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,27 +20,31 @@ export const Step2Financials = () => {
   const { draftData, rowVersion, setRowVersion } = useOutletContext<CompanySetupContextType>();
   const [isLoading, setIsLoading] = useState(false);
 
+  const defaultFormValues = useMemo(() => {
+    const f: any = draftData?.financials || draftData || {};
+    return {
+      financialYearStart: f.financialYearStart || "",
+      booksStartDate: f.booksStartDate || "",
+      accountingMethod: f.accountingMethod || "Accrual",
+      fiscalYear: f.fiscalYear || "Jan-Dec",
+      baseCurrency: f.baseCurrency || "AED",
+      reportingCurrency: f.reportingCurrency || "USD",
+      financialYearEnd: f.financialYearEnd || "",
+      defaultCostCenterId: f.defaultCostCenterId || "",
+      defaultProjectId: f.defaultProjectId || "",
+    };
+  }, [draftData]);
+
   const methods = useForm<Step2FormData>({
     resolver: zodResolver(step2Schema),
-    defaultValues: {
-      financialYearStart: "",
-      booksStartDate: "",
-      accountingMethod: "Accrual",
-      fiscalYear: "Jan-Dec",
-      baseCurrency: "AED",
-      reportingCurrency: "USD",
-      financialYearEnd: "",
-      defaultCostCenterId: "",
-      defaultProjectId: "",
-    },
+    defaultValues: defaultFormValues,
   });
 
   useEffect(() => {
     if (draftData) {
-      const financialsData = draftData.financials || draftData;
-      methods.reset({ ...methods.getValues(), ...financialsData });
+      methods.reset(defaultFormValues);
     }
-  }, [draftData, methods]);
+  }, [defaultFormValues, methods]);
 
   const fyStart = methods.watch("financialYearStart");
 
