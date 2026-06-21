@@ -34,6 +34,7 @@ export const FormInput = ({ name, label, className, ...props }: FormInputProps) 
               className
             )}
             {...field}
+            value={field.value ?? ""}
             {...props}
           />
           {error && (

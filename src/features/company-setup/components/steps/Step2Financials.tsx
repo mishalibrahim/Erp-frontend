@@ -1,18 +1,23 @@
-import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useForm, FormProvider } from "react-hook-form";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams, useOutletContext } from "react-router-dom";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { FormSelect } from "@/components/hook-form/FormSelect";
 import { FormDatePicker } from "@/components/hook-form/FormDatePicker";
+import { FormInput } from "@/components/hook-form/FormInput";
+import { Form } from "@/components/hook-form/Form";
+import { format, addYears, subDays, parseISO } from "date-fns";
 import { WizardFooter } from "../WizardFooter";
 import { step2Schema, type Step2FormData } from "../../schemas/companySetupSchemas";
 import { companySetupApi } from "../../api/companySetupApi";
+import type { CompanySetupContextType } from "../CompanySetupWizard";
 
 export const Step2Financials = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const draftId = searchParams.get("draftId");
+  const { draftData, rowVersion, setRowVersion } = useOutletContext<CompanySetupContextType>();
   const [isLoading, setIsLoading] = useState(false);
 
   const methods = useForm<Step2FormData>({
@@ -24,8 +29,32 @@ export const Step2Financials = () => {
       fiscalYear: "Jan-Dec",
       baseCurrency: "AED",
       reportingCurrency: "USD",
+      financialYearEnd: "",
+      defaultCostCenterId: "",
+      defaultProjectId: "",
     },
   });
+
+  useEffect(() => {
+    if (draftData) {
+      const financialsData = draftData.financials || draftData;
+      methods.reset({ ...methods.getValues(), ...financialsData });
+    }
+  }, [draftData, methods]);
+
+  const fyStart = methods.watch("financialYearStart");
+
+  useEffect(() => {
+    if (fyStart && typeof fyStart === "string") {
+      try {
+        const startDate = parseISO(fyStart);
+        const endDate = subDays(addYears(startDate, 1), 1);
+        methods.setValue("financialYearEnd", format(endDate, "yyyy-MM-dd"));
+      } catch {
+        // invalid date
+      }
+    }
+  }, [fyStart, methods]);
 
   const onSubmit = async (data: Step2FormData) => {
     if (!draftId) {
@@ -33,25 +62,31 @@ export const Step2Financials = () => {
       return;
     }
     setIsLoading(true);
+    const cleanData = {
+      ...data,
+      financialYearEnd: data.financialYearEnd || undefined,
+      rowVersion,
+    };
     try {
-      await companySetupApi.updateDraft(draftId, { financials: data });
+      const response = await companySetupApi.updateFinancials(draftId, cleanData);
+      setRowVersion(response.rowVersion);
       navigate(`/settings/company-setup/wizard/step-3?draftId=${draftId}`);
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to save data");
+    } catch {
+      // Error is handled by global axios interceptor
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
-        <div className="mb-6">
+    <Form methods={methods} onSubmit={onSubmit}>
+      <div className="mb-6">
           <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
             Fiscal Period
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormDatePicker name="financialYearStart" label="Financial Year Start *" placeholder="Select date" />
+            <FormInput name="financialYearEnd" label="Financial Year End" placeholder="Auto-calculated" disabled className="bg-muted/50 cursor-not-allowed" />
             <FormDatePicker name="booksStartDate" label="Books Start Date *" placeholder="Select date" />
             <FormSelect
               name="fiscalYear"
@@ -106,11 +141,20 @@ export const Step2Financials = () => {
           </div>
         </div>
 
+        <div className="mb-2">
+          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+            Default Dimensions
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <FormInput name="defaultCostCenterId" label="Default Cost Center ID" placeholder="Enter ID" />
+            <FormInput name="defaultProjectId" label="Default Project ID" placeholder="Enter ID" />
+          </div>
+        </div>
+
         <WizardFooter
           isLoading={isLoading}
           onBack={() => navigate(`/settings/company-setup/wizard/step-1?draftId=${draftId}`)}
         />
-      </form>
-    </FormProvider>
+    </Form>
   );
 };

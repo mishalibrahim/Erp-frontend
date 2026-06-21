@@ -27,7 +27,25 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
-const navGroups = [
+type NavSubItem = {
+  title: string;
+  url: string;
+};
+
+type NavItem = {
+  title: string;
+  url: string;
+  icon: any;
+  isActive?: boolean;
+  items?: NavSubItem[];
+};
+
+type NavGroup = {
+  label: string;
+  items: NavItem[];
+};
+
+const navGroups: NavGroup[] = [
   {
     label: "Home",
     items: [

@@ -68,7 +68,6 @@ export const FormDatePicker = ({
                 onSelect={(date) => {
                   field.onChange(date ? date.toISOString() : undefined);
                 }}
-                initialFocus
               />
             </PopoverContent>
           </Popover>

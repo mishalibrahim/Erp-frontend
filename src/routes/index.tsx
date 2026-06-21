@@ -10,9 +10,10 @@ import { Step1BasicInfo } from "@/features/company-setup/components/steps/Step1B
 import { Step2Financials } from "@/features/company-setup/components/steps/Step2Financials";
 import { Step3Localization } from "@/features/company-setup/components/steps/Step3Localization";
 import { Step4Addresses } from "@/features/company-setup/components/steps/Step4Addresses";
-import { Step5VatDetails } from "@/features/company-setup/components/steps/Step5VatDetails";
-import { Step6CorporateTax } from "@/features/company-setup/components/steps/Step6CorporateTax";
-import { Step7Controls } from "@/features/company-setup/components/steps/Step7Controls";
+import { Step5Taxes } from "@/features/company-setup/components/steps/Step5Taxes";
+import { Step6Controls } from "@/features/company-setup/components/steps/Step6Controls";
+import { Step7BankDetails } from "@/features/company-setup/components/steps/Step7BankDetails";
+import { Step8UsersRoles } from "@/features/company-setup/components/steps/Step8UsersRoles";
 
 export const router = createBrowserRouter([
   {
@@ -48,9 +49,10 @@ export const router = createBrowserRouter([
           { path: "step-2", element: <Step2Financials /> },
           { path: "step-3", element: <Step3Localization /> },
           { path: "step-4", element: <Step4Addresses /> },
-          { path: "step-5", element: <Step5VatDetails /> },
-          { path: "step-6", element: <Step6CorporateTax /> },
-          { path: "step-7", element: <Step7Controls /> },
+          { path: "step-5", element: <Step5Taxes /> },
+          { path: "step-6", element: <Step6Controls /> },
+          { path: "step-7", element: <Step7BankDetails /> },
+          { path: "step-8", element: <Step8UsersRoles /> },
         ],
       },
     ],

@@ -40,7 +40,7 @@ export const FormSelect = ({
               {label}
             </Label>
           )}
-          <Select onValueChange={field.onChange} value={field.value}>
+          <Select onValueChange={field.onChange} value={field.value ?? undefined}>
             <SelectTrigger
               id={name}
               className={cn(

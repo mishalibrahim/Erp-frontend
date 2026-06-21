@@ -1,26 +1,39 @@
+import { useState, useEffect } from "react";
 import { Outlet, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { toast } from "sonner";
 import {
   Building2,
   DollarSign,
   Globe,
   MapPin,
   Receipt,
-  Landmark,
   Settings2,
   CheckCircle2,
   ChevronLeft,
+  Users,
+  Landmark,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { companySetupApi, type CompanyDetailsDto } from "../api/companySetupApi";
+
+export interface CompanySetupContextType {
+  draftData: CompanyDetailsDto | null;
+  rowVersion: string;
+  setRowVersion: (version: string) => void;
+  setDraftData: (data: CompanyDetailsDto | null) => void;
+}
 
 const STEPS = [
   { id: "step-1", label: "Basic Info",     description: "Company identity & license",    icon: Building2 },
   { id: "step-2", label: "Financials",     description: "Fiscal year & currency",        icon: DollarSign },
   { id: "step-3", label: "Localization",   description: "Language, timezone & format",   icon: Globe },
   { id: "step-4", label: "Addresses",      description: "Registered & billing address",  icon: MapPin },
-  { id: "step-5", label: "VAT Details",    description: "Tax registration & scheme",     icon: Receipt },
-  { id: "step-6", label: "Corporate Tax",  description: "CT registration & status",      icon: Landmark },
-  { id: "step-7", label: "Controls",       description: "System preferences",            icon: Settings2 },
+  { id: "step-5", label: "Taxes",          description: "VAT & Corporate Tax setup",     icon: Receipt },
+  { id: "step-6", label: "Controls",       description: "System preferences",            icon: Settings2 },
+  { id: "step-7", label: "Bank Details",   description: "Accounts & billing",            icon: Landmark },
+  { id: "step-8", label: "Users & Access", description: "Team invites & roles",          icon: Users },
 ];
 
 // ─── Mobile: slim top progress bar ───────────────────────────────────────────
@@ -33,7 +46,6 @@ const MobileProgressBar = ({
   total: number;
   currentStep: (typeof STEPS)[0];
 }) => {
-  const pct = Math.round(((currentIndex + 1) / total) * 100);
   const Icon = currentStep.icon;
   return (
     <div className="lg:hidden w-full">
@@ -180,6 +192,49 @@ export const CompanySetupWizard = () => {
   const location = useLocation();
   const draftId = searchParams.get("draftId");
 
+  const [draftData, setDraftData] = useState<CompanyDetailsDto | null>(null);
+  const [rowVersion, setRowVersion] = useState<string>("");
+  const [isFetchingData, setIsFetchingData] = useState(false);
+
+  useEffect(() => {
+    if (draftId) {
+      const fetchDraftData = async () => {
+        setIsFetchingData(true);
+        try {
+          const data = await companySetupApi.getById(draftId);
+          
+          const stripNulls = (obj: any): any => {
+            if (obj === null) return undefined;
+            if (Array.isArray(obj)) return obj.map(stripNulls).filter((v) => v !== undefined);
+            if (typeof obj === 'object' && obj !== null) {
+              const newObj: any = {};
+              for (const key in obj) {
+                const val = stripNulls(obj[key]);
+                if (val !== undefined) {
+                  newObj[key] = val;
+                }
+              }
+              return newObj;
+            }
+            return obj;
+          };
+
+          const cleanedData = stripNulls(data);
+          setDraftData(cleanedData);
+          setRowVersion(data.rowVersion || "");
+        } catch (error) {
+          toast.error("Failed to load company setup draft.");
+        } finally {
+          setIsFetchingData(false);
+        }
+      };
+      fetchDraftData();
+    } else {
+      setDraftData({});
+      setRowVersion("");
+    }
+  }, [draftId]);
+
   const currentStepId = location.pathname.split("/").pop();
   const rawIndex = STEPS.findIndex((s) => s.id === currentStepId);
   const currentStepIndex = rawIndex >= 0 ? rawIndex : 0;
@@ -261,19 +316,25 @@ export const CompanySetupWizard = () => {
             </div>
 
             {/* Form card */}
-            <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                  key={location.pathname}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.18, ease: "easeOut" }}
-                  className="p-4 sm:p-6"
-                >
-                  <Outlet />
-                </motion.div>
-              </AnimatePresence>
+            <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden min-h-[400px]">
+              {isFetchingData || !draftData ? (
+                <div className="flex items-center justify-center h-[400px]">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : (
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.div
+                    key={location.pathname}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
+                    className="p-4 sm:p-6"
+                  >
+                    <Outlet context={{ draftData, rowVersion, setRowVersion, setDraftData }} />
+                  </motion.div>
+                </AnimatePresence>
+              )}
             </div>
           </div>
         </div>

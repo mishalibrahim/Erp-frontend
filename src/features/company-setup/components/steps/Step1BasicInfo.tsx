@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useForm, FormProvider } from "react-hook-form";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams, useOutletContext } from "react-router-dom";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { FormInput } from "@/components/hook-form/FormInput";
@@ -8,14 +8,17 @@ import { FormSelect } from "@/components/hook-form/FormSelect";
 import { FormSwitch } from "@/components/hook-form/FormSwitch";
 import { FormDatePicker } from "@/components/hook-form/FormDatePicker";
 import { FormCountrySelect } from "@/components/hook-form/FormCountrySelect";
+import { Form } from "@/components/hook-form/Form";
 import { WizardFooter } from "../WizardFooter";
 import { step1Schema, type Step1FormData } from "../../schemas/companySetupSchemas";
 import { companySetupApi } from "../../api/companySetupApi";
+import type { CompanySetupContextType } from "../CompanySetupWizard";
 
 export const Step1BasicInfo = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const draftId = searchParams.get("draftId");
+  const { draftData, rowVersion, setRowVersion } = useOutletContext<CompanySetupContextType>();
   const [isLoading, setIsLoading] = useState(false);
 
   const methods = useForm<Step1FormData>({
@@ -32,28 +35,41 @@ export const Step1BasicInfo = () => {
     },
   });
 
+  useEffect(() => {
+    if (draftData) {
+      methods.reset({ ...methods.getValues(), ...draftData });
+    }
+  }, [draftData, methods]);
+
+  const isFreeZoneEntity = methods.watch("isFreeZoneEntity");
+
   const onSubmit = async (data: Step1FormData) => {
     setIsLoading(true);
+    const cleanData = {
+      ...data,
+      licenseExpiryDate: data.licenseExpiryDate || undefined,
+      rowVersion,
+    };
     try {
       if (draftId) {
-        await companySetupApi.updateDraft(draftId, data);
+        const response = await companySetupApi.updateGeneral(draftId, cleanData);
+        if (setRowVersion) setRowVersion(response.rowVersion);
         navigate(`/settings/company-setup/wizard/step-2?draftId=${draftId}`);
       } else {
-        const response = await companySetupApi.createDraft(data);
+        const response = await companySetupApi.createDraft(cleanData);
         toast.success("Company draft created!");
         navigate(`/settings/company-setup/wizard/step-2?draftId=${response.id}`);
       }
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to save. Please try again.");
+    } catch {
+      // Error is handled by global axios interceptor
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
-        {/* Identity */}
+    <Form methods={methods} onSubmit={onSubmit}>
+      {/* Identity */}
         <div className="mb-6">
           <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
             Company Identity
@@ -85,9 +101,8 @@ export const Step1BasicInfo = () => {
             />
             <FormDatePicker name="registrationDate" label="Registration Date *" placeholder="Select date" />
             <FormDatePicker name="licenseExpiryDate" label="License Expiry Date" placeholder="Select date (optional)" />
-            <div className="sm:col-span-2">
-              <FormInput name="emirate" label="Emirate / State" placeholder="e.g. Dubai" />
-            </div>
+            <FormInput name="emirate" label="Emirate / State" placeholder="e.g. Dubai" />
+            <FormInput name="placeOfIncorporation" label="Place of Incorporation" placeholder="e.g. UAE" />
           </div>
         </div>
 
@@ -102,16 +117,17 @@ export const Step1BasicInfo = () => {
               label="Free Zone Entity"
               description="Company is registered in a UAE Free Zone."
             />
-            <FormSwitch
-              name="isDesignatedZone"
-              label="Designated Zone"
-              description="Applicable for VAT designated zones."
-            />
+            {isFreeZoneEntity && (
+              <FormSwitch
+                name="isDesignatedZone"
+                label="Designated Zone"
+                description="Applicable for VAT designated zones."
+              />
+            )}
           </div>
         </div>
 
         <WizardFooter isLoading={isLoading} />
-      </form>
-    </FormProvider>
+    </Form>
   );
 };

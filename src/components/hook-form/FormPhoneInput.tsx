@@ -52,6 +52,7 @@ export const FormPhoneInput = ({
                 "w-full flex items-center gap-1",
                 "[&_.PhoneInputCountry]:flex [&_.PhoneInputCountry]:items-center [&_.PhoneInputCountry]:shrink-0",
                 "[&_.PhoneInputCountrySelect]:bg-transparent [&_.PhoneInputCountrySelect]:border-none [&_.PhoneInputCountrySelect]:outline-none [&_.PhoneInputCountrySelect]:text-sm [&_.PhoneInputCountrySelect]:cursor-pointer [&_.PhoneInputCountrySelect]:p-0",
+                "[&_option]:bg-background [&_option]:text-foreground",
                 "[&_.PhoneInputCountryIcon]:w-5 [&_.PhoneInputCountryIcon]:h-auto",
                 "[&_.PhoneInputCountrySelectArrow]:ml-1 [&_.PhoneInputCountrySelectArrow]:opacity-50",
                 "[&_input]:flex-1 [&_input]:bg-transparent [&_input]:border-none [&_input]:outline-none [&_input]:text-sm [&_input]:pl-2 [&_input]:min-w-0",

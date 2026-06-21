@@ -26,12 +26,28 @@ axiosClient.interceptors.response.use(
     return response;
   },
   async (error) => {
-    if (error.response && error.response.status === 401) {
-      toast.error("Session Expired", {
-        description:
-          "Your session has expired or is invalid. Please log in again.",
-        id: "session-expired",
-      });
+    if (error.response) {
+      switch (error.response.status) {
+        case 401:
+          toast.error("Session Expired", {
+            description: "Your session has expired or is invalid. Please log in again.",
+            id: "session-expired",
+          });
+          break;
+        case 409:
+          toast.error("Concurrency Conflict", {
+            description: "Another admin has modified this data. Please refresh to get the latest data.",
+            id: "concurrency-conflict",
+          });
+          break;
+        default: {
+          const message = error.response.data?.message || "An unexpected error occurred.";
+          toast.error(message);
+          break;
+        }
+      }
+    } else {
+      toast.error("Network error. Please check your connection.");
     }
     return Promise.reject(error);
   },

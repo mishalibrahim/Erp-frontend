@@ -12,7 +12,7 @@ interface FormSwitchProps {
 // We intentionally avoid Radix Switch here because wrapping it in a <label>
 // causes a double-fire (label click + switch internal click), which cancels out
 // and keeps the value the same. A hand-rolled toggle gives us total control.
-const TogglePill = ({
+export const TogglePill = ({
   checked,
   onChange,
   id,
