@@ -5,13 +5,15 @@ export interface User {
   email: string;
   role: string;
   tenantId: string;
+  permissions: string[];
 }
 
 export interface AuthResponse {
   token: string;
   email: string;
-  role: string;
+  roleName: string;
   tenantId: string;
+  permissions: string[];
 }
 
 export interface LoginCredentials {
@@ -24,7 +26,7 @@ export interface MeResponse {
   firstName: string;
   lastName: string;
   email: string;
-  role: string;
+  roleName: string;
   tenantId: string;
+  permissions: string[];
 }
-

@@ -34,6 +34,7 @@ import {
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { companySetupApi, type CompanyListItem } from "../api/companySetupApi";
+import { RequirePermission } from "@/components/shared/RequirePermission";
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 const StatusBadge = ({ status }: { status: CompanyListItem["status"] }) => {
@@ -212,10 +213,12 @@ export const TenantListPage = () => {
             Manage all company tenants in your ERP system.
           </p>
         </div>
-        <Button className="gap-2 w-full sm:w-auto" onClick={handleAddNew}>
-          <Plus className="h-4 w-4" />
-          Add Company
-        </Button>
+        <RequirePermission module="CompanySetup" action="Create">
+          <Button className="gap-2 w-full sm:w-auto" onClick={handleAddNew}>
+            <Plus className="h-4 w-4" />
+            Add Company
+          </Button>
+        </RequirePermission>
       </div>
 
       {/* ── Summary KPIs ─────────────────────────────── */}
@@ -459,26 +462,30 @@ export const TenantListPage = () => {
                             Actions
                           </DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => handleEdit(company)}>
-                            <Pencil className="h-4 w-4" />
-                            Edit Company
-                          </DropdownMenuItem>
-                          {company.status === "Draft" && (
-                            <DropdownMenuItem
-                              onClick={() => handleCompleteDraft(company)}
-                            >
-                              <ClipboardCheck className="h-4 w-4" />
-                              Complete Setup
+                          <RequirePermission module="CompanySetup" action="Update">
+                            <DropdownMenuItem onClick={() => handleEdit(company)}>
+                              <Pencil className="h-4 w-4" />
+                              Edit Company
                             </DropdownMenuItem>
-                          )}
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            variant="destructive"
-                            onClick={() => setToDelete(company)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
+                            {company.status === "Draft" && (
+                              <DropdownMenuItem
+                                onClick={() => handleCompleteDraft(company)}
+                              >
+                                <ClipboardCheck className="h-4 w-4" />
+                                Complete Setup
+                              </DropdownMenuItem>
+                            )}
+                          </RequirePermission>
+                          <RequirePermission module="CompanySetup" action="Delete">
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              variant="destructive"
+                              onClick={() => setToDelete(company)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </RequirePermission>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>

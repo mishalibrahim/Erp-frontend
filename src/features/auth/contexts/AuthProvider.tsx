@@ -37,8 +37,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             firstName: data.firstName,
             lastName: data.lastName,
             email: data.email,
-            role: data.role,
+            role: data.roleName,
             tenantId: data.tenantId,
+            permissions: data.permissions || [],
           });
         } catch (error) {
           // If the token is expired or invalid, clear it out
@@ -52,7 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     const data = await loginApi({ email, password });
-    const { token, role, tenantId } = data;
+    const { token, roleName, tenantId, permissions } = data;
 
     // Save token securely to local storage
     localStorage.setItem("jwt_token", token);
@@ -63,8 +64,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       firstName: "",
       lastName: "",
       email,
-      role,
+      role: roleName,
       tenantId,
+      permissions: permissions || [],
     });
   };
   const logout = () => {

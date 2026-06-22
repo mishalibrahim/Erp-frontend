@@ -131,7 +131,7 @@ export const step8Schema = z.object({
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "Last name is required"),
     email: z.string().email("Invalid email address"),
-    role: z.string().min(1, "Role is required"),
+    roleId: z.string().min(1, "Role is required"),
     password: z.string().optional().refine(val => !val || val.length >= 8, {
       message: "Password must be at least 8 characters",
     }),

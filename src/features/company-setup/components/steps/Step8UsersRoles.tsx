@@ -12,6 +12,7 @@ import { companySetupApi } from "../../api/companySetupApi";
 import { Plus, Trash2, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { CompanySetupContextType } from "../CompanySetupWizard";
+import { rolesApi, type Role } from "@/features/auth/api/rolesApi";
 
 export const Step8UsersRoles = () => {
   const navigate = useNavigate();
@@ -19,6 +20,19 @@ export const Step8UsersRoles = () => {
   const draftId = searchParams.get("draftId");
   const { draftData, rowVersion } = useOutletContext<CompanySetupContextType>();
   const [isLoading, setIsLoading] = useState(false);
+  const [roles, setRoles] = useState<Role[]>([]);
+
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const fetchedRoles = await rolesApi.getRoles();
+        setRoles(fetchedRoles);
+      } catch (error) {
+        toast.error("Failed to fetch roles.");
+      }
+    };
+    fetchRoles();
+  }, []);
 
   const methods = useForm<Step8FormData>({
     resolver: zodResolver(step8Schema),
@@ -29,9 +43,14 @@ export const Step8UsersRoles = () => {
 
   useEffect(() => {
     if (draftData) {
-      const usersData = draftData.userTenantAccesses 
-        ? { userTenantAccess: draftData.userTenantAccesses } 
-        : draftData;
+      const accesses = draftData.userTenantAccesses || (draftData as any).userTenantAccess || [];
+      // Map any legacy 'role' strings to 'roleId' if necessary, though backend should return roleId now
+      const mappedAccesses = accesses.map((access: any) => ({
+        ...access,
+        roleId: access.roleId || access.role || "",
+      }));
+      
+      const usersData = { userTenantAccess: mappedAccesses };
       methods.reset({ ...methods.getValues(), ...usersData });
     }
   }, [draftData, methods]);
@@ -84,7 +103,7 @@ export const Step8UsersRoles = () => {
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => append({ firstName: "", lastName: "", email: "", role: "User", password: "" })}
+              onClick={() => append({ firstName: "", lastName: "", email: "", roleId: "", password: "" })}
               className="gap-1.5 h-8 text-xs"
             >
               <Plus className="w-3.5 h-3.5" /> Add User
@@ -141,15 +160,13 @@ export const Step8UsersRoles = () => {
                   </div>
                   <div className="md:col-span-6">
                     <FormSelect
-                      name={`userTenantAccess.${index}.role`}
+                      name={`userTenantAccess.${index}.roleId`}
                       label="Role *"
                       placeholder="Select Role"
-                      options={[
-                        { label: "Administrator", value: "Admin" },
-                        { label: "Accountant", value: "Accountant" },
-                        { label: "Manager", value: "Manager" },
-                        { label: "Viewer", value: "Viewer" },
-                      ]}
+                      options={roles.map((r) => ({
+                        label: r.name,
+                        value: r.id,
+                      }))}
                     />
                   </div>
                 </div>
