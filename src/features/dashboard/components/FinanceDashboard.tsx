@@ -20,7 +20,8 @@ import {
 import { useAuth } from "@/features/auth/hooks/useAuth";
 
 export function FinanceDashboard() {
-  const { activeTenant } = useAuth();
+  const { activeTenantId, tenants } = useAuth();
+  const activeTenant = tenants.find(t => t.id === activeTenantId);
 
   return (
     <div className="space-y-6">
@@ -28,7 +29,7 @@ export function FinanceDashboard() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs text-muted-foreground">
-            {activeTenant.name} &rsaquo; Dashboard
+            {activeTenant?.companyName || "Dashboard"} &rsaquo; Dashboard
           </p>
           <h1 className="text-2xl font-bold tracking-tight">Finance Dashboard</h1>
           <p className="text-xs text-muted-foreground mt-0.5">

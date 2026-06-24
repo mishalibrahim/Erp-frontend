@@ -12,6 +12,7 @@ export interface AuthResponse {
   token: string;
   email: string;
   roleName: string;
+  role?: string;
   tenantId: string;
   permissions: string[];
 }

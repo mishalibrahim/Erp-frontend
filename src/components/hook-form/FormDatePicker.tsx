@@ -15,6 +15,7 @@ interface FormDatePickerProps {
   label?: string;
   placeholder?: string;
   className?: string;
+  disabled?: boolean;
 }
 
 export const FormDatePicker = ({
@@ -22,6 +23,7 @@ export const FormDatePicker = ({
   label,
   placeholder = "Pick a date",
   className,
+  disabled,
 }: FormDatePickerProps) => {
   const { control } = useFormContext();
 
@@ -34,7 +36,7 @@ export const FormDatePicker = ({
           {label && (
             <Label
               htmlFor={name}
-              className={cn("text-sm font-medium", error && "text-destructive")}
+              className={cn("text-sm font-medium", error && "text-destructive", disabled && "opacity-50 cursor-not-allowed")}
             >
               {label}
             </Label>
@@ -44,12 +46,14 @@ export const FormDatePicker = ({
               <button
                 id={name}
                 type="button"
+                disabled={disabled}
                 className={cn(
                   "h-10 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-sm transition-colors",
                   "flex items-center gap-2 text-left",
                   "focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent",
                   !field.value && "text-muted-foreground",
                   error && "border-destructive focus:ring-destructive",
+                  disabled && "opacity-50 cursor-not-allowed",
                   className
                 )}
               >

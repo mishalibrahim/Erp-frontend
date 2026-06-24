@@ -1,4 +1,5 @@
 import { axiosClient } from "@/lib/axiosClient";
+import { API_ENDPOINTS } from "@/config/apiEndpoints";
 
 export interface CreateCompanyResponse {
   id: string;
@@ -88,58 +89,58 @@ export interface CompanyDetailsDto extends Partial<Step1FormData> {
 export const companySetupApi = {
   /** GET all companies/tenants */
   getAll: async (): Promise<CompanyListItem[]> => {
-    const response = await axiosClient.get("/api/CompanySetup");
+    const response = await axiosClient.get(API_ENDPOINTS.COMPANY_SETUP.BASE);
     return response.data;
   },
 
   /** GET single company by id (Full CompanyDetailsDto with RowVersion) */
   getById: async (id: string): Promise<CompanyDetailsDto> => {
-    const response = await axiosClient.get(`/api/CompanySetup/${id}`);
+    const response = await axiosClient.get(API_ENDPOINTS.COMPANY_SETUP.BY_ID(id));
     return response.data;
   },
 
   /** POST create a new draft */
   createDraft: async (data: Step1FormData): Promise<CreateCompanyResponse> => {
-    const response = await axiosClient.post("/api/CompanySetup", data);
+    const response = await axiosClient.post(API_ENDPOINTS.COMPANY_SETUP.BASE, data);
     return response.data;
   },
 
   /** PUT step-specific updates */
   updateGeneral: async (id: string, data: WithRowVersion<Step1FormData>): Promise<UpdateCompanyResponse> => {
-    const response = await axiosClient.put(`/api/CompanySetup/${id}/general`, data);
+    const response = await axiosClient.put(API_ENDPOINTS.COMPANY_SETUP.UPDATE_GENERAL(id), data);
     return response.data;
   },
   updateFinancials: async (id: string, data: WithRowVersion<Step2FormData>): Promise<UpdateCompanyResponse> => {
-    const response = await axiosClient.put(`/api/CompanySetup/${id}/financials`, data);
+    const response = await axiosClient.put(API_ENDPOINTS.COMPANY_SETUP.UPDATE_FINANCIALS(id), data);
     return response.data;
   },
   updateLocalization: async (id: string, data: WithRowVersion<Step3FormData>): Promise<UpdateCompanyResponse> => {
-    const response = await axiosClient.put(`/api/CompanySetup/${id}/localization`, data);
+    const response = await axiosClient.put(API_ENDPOINTS.COMPANY_SETUP.UPDATE_LOCALIZATION(id), data);
     return response.data;
   },
   updateAddresses: async (id: string, data: WithRowVersion<Step4FormData>): Promise<UpdateCompanyResponse> => {
-    const response = await axiosClient.put(`/api/CompanySetup/${id}/addresses`, data);
+    const response = await axiosClient.put(API_ENDPOINTS.COMPANY_SETUP.UPDATE_ADDRESSES(id), data);
     return response.data;
   },
   updateTaxes: async (id: string, data: WithRowVersion<Step5FormData>): Promise<UpdateCompanyResponse> => {
-    const response = await axiosClient.put(`/api/CompanySetup/${id}/taxes`, data);
+    const response = await axiosClient.put(API_ENDPOINTS.COMPANY_SETUP.UPDATE_TAXES(id), data);
     return response.data;
   },
   updateControls: async (id: string, data: WithRowVersion<Step6FormData>): Promise<UpdateCompanyResponse> => {
-    const response = await axiosClient.put(`/api/CompanySetup/${id}/system-controls`, data);
+    const response = await axiosClient.put(API_ENDPOINTS.COMPANY_SETUP.UPDATE_SYSTEM_CONTROLS(id), data);
     return response.data;
   },
   updateBankAccounts: async (id: string, data: WithRowVersion<Step7FormData>): Promise<UpdateCompanyResponse> => {
-    const response = await axiosClient.put(`/api/CompanySetup/${id}/bank-accounts`, data);
+    const response = await axiosClient.put(API_ENDPOINTS.COMPANY_SETUP.UPDATE_BANK_ACCOUNTS(id), data);
     return response.data;
   },
   updateUsers: async (id: string, data: WithRowVersion<Step8FormData> & { status?: string }): Promise<UpdateCompanyResponse> => {
-    const response = await axiosClient.put(`/api/CompanySetup/${id}/users`, data);
+    const response = await axiosClient.put(API_ENDPOINTS.COMPANY_SETUP.UPDATE_USERS(id), data);
     return response.data;
   },
 
   /** DELETE a company */
   delete: async (id: string): Promise<void> => {
-    await axiosClient.delete(`/api/CompanySetup/${id}`);
+    await axiosClient.delete(API_ENDPOINTS.COMPANY_SETUP.BY_ID(id));
   },
 };

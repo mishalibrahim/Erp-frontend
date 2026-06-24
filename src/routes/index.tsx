@@ -14,6 +14,8 @@ import { Step5Taxes } from "@/features/company-setup/components/steps/Step5Taxes
 import { Step6Controls } from "@/features/company-setup/components/steps/Step6Controls";
 import { Step7BankDetails } from "@/features/company-setup/components/steps/Step7BankDetails";
 import { Step8UsersRoles } from "@/features/company-setup/components/steps/Step8UsersRoles";
+import { ChartOfAccountsList } from "@/features/chart-of-accounts/components/ChartOfAccountsList";
+import { JournalEntryList } from "@/features/journal-entries/components/JournalEntryList";
 
 export const router = createBrowserRouter([
   {
@@ -54,6 +56,15 @@ export const router = createBrowserRouter([
           { path: "step-7", element: <Step7BankDetails /> },
           { path: "step-8", element: <Step8UsersRoles /> },
         ],
+      },
+      // ── General Ledger ───────────────────────────────────────────────────
+      {
+        path: "/general-ledger/chart-of-accounts",
+        element: <ChartOfAccountsList />,
+      },
+      {
+        path: "/general-ledger/journal-entries",
+        element: <JournalEntryList />,
       },
     ],
   },

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Outlet, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { toast } from "sonner";
+
 import {
   Building2,
   DollarSign,
@@ -16,7 +16,8 @@ import {
   Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { companySetupApi, type CompanyDetailsDto } from "../api/companySetupApi";
+import { type CompanyDetailsDto } from "../api/companySetupApi";
+import { useGetCompanyById } from "../hooks/useCompanySetup";
 
 export interface CompanySetupContextType {
   draftData: CompanyDetailsDto | null;
@@ -194,14 +195,11 @@ export const CompanySetupWizard = () => {
 
   const [draftData, setDraftData] = useState<CompanyDetailsDto | null>(null);
   const [rowVersion, setRowVersion] = useState<string>("");
-  const [isFetchingData, setIsFetchingData] = useState(false);
 
-  const fetchDraftData = async () => {
-    if (!draftId) return;
-    setIsFetchingData(true);
-    try {
-      const data = await companySetupApi.getById(draftId);
-      
+  const { data, isLoading: isFetchingData, isFetching } = useGetCompanyById(draftId);
+
+  useEffect(() => {
+    if (draftId && data) {
       const stripNulls = (obj: any): any => {
         if (obj === null) return undefined;
         if (Array.isArray(obj)) return obj.map(stripNulls).filter((v) => v !== undefined);
@@ -221,21 +219,11 @@ export const CompanySetupWizard = () => {
       const cleanedData = stripNulls(data);
       setDraftData(cleanedData);
       setRowVersion(data.rowVersion || "");
-    } catch (error) {
-      toast.error("Failed to load company setup draft.");
-    } finally {
-      setIsFetchingData(false);
-    }
-  };
-
-  useEffect(() => {
-    if (draftId) {
-      fetchDraftData();
-    } else {
+    } else if (!draftId) {
       setDraftData({});
       setRowVersion("");
     }
-  }, [draftId, location.pathname]);
+  }, [data, draftId, isFetching]);
 
   const currentStepId = location.pathname.split("/").pop();
   const rawIndex = STEPS.findIndex((s) => s.id === currentStepId);

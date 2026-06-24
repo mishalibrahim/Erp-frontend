@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams, useOutletContext } from "react-router-dom";
+import { useSearchParams, useOutletContext, useNavigate } from "react-router-dom";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -12,7 +12,7 @@ import { companySetupApi } from "../../api/companySetupApi";
 import { Plus, Trash2, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { CompanySetupContextType } from "../CompanySetupWizard";
-import { rolesApi, type Role } from "@/features/auth/api/rolesApi";
+import { useGetRoles } from "@/features/auth/hooks/useRoles";
 
 export const Step8UsersRoles = () => {
   const navigate = useNavigate();
@@ -20,19 +20,8 @@ export const Step8UsersRoles = () => {
   const draftId = searchParams.get("draftId");
   const { draftData, rowVersion } = useOutletContext<CompanySetupContextType>();
   const [isLoading, setIsLoading] = useState(false);
-  const [roles, setRoles] = useState<Role[]>([]);
-
-  useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const fetchedRoles = await rolesApi.getRoles();
-        setRoles(fetchedRoles);
-      } catch (error) {
-        toast.error("Failed to fetch roles.");
-      }
-    };
-    fetchRoles();
-  }, []);
+  
+  const { data: roles = [] } = useGetRoles();
 
   const methods = useForm<Step8FormData>({
     resolver: zodResolver(step8Schema),

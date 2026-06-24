@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Building2,
@@ -33,8 +33,9 @@ import {
 } from "@/components/ui/table";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { companySetupApi, type CompanyListItem } from "../api/companySetupApi";
+import { type CompanyListItem } from "../api/companySetupApi";
 import { RequirePermission } from "@/components/shared/RequirePermission";
+import { useGetCompanies, useDeleteCompany } from "../hooks/useCompanySetup";
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 const StatusBadge = ({ status }: { status: CompanyListItem["status"] }) => {
@@ -139,37 +140,20 @@ const EmptyState = ({ onAdd }: { onAdd: () => void }) => (
 // ─── Main Component ───────────────────────────────────────────────────────────
 export const TenantListPage = () => {
   const navigate = useNavigate();
-  const [companies, setCompanies] = useState<CompanyListItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: companies = [], isLoading, refetch } = useGetCompanies();
+  const deleteCompanyMutation = useDeleteCompany();
   const [searchQuery, setSearchQuery] = useState("");
   const [toDelete, setToDelete] = useState<CompanyListItem | null>(null);
-
-  const loadCompanies = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const data = await companySetupApi.getAll();
-      setCompanies(data);
-    } catch {
-      toast.error("Failed to load companies");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadCompanies();
-  }, [loadCompanies]);
 
   const handleDelete = async () => {
     if (!toDelete) return;
     try {
-      await companySetupApi.delete(toDelete.id);
-      toast.success("Draft deleted successfully");
-      loadCompanies();
-    } catch {
-      toast.error("Failed to delete draft");
-    } finally {
+      await deleteCompanyMutation.mutateAsync(toDelete.id);
+      toast.success(`${toDelete.companyName} has been deleted.`);
       setToDelete(null);
+      refetch();
+    } catch {
+      toast.error("Failed to delete company");
     }
   };
 
@@ -268,7 +252,7 @@ export const TenantListPage = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={loadCompanies}
+              onClick={() => refetch()}
               disabled={isLoading}
               className="gap-1.5 text-muted-foreground self-end sm:self-auto"
             >
