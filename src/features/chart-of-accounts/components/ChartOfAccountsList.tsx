@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { Plus, Edit2, Trash2, ChevronRight, ChevronDown } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -97,7 +98,12 @@ export function ChartOfAccountsList() {
             ) : (
               <span className="w-4" /> // placeholder for alignment
             )}
-            <span className="font-medium">{row.original.accountNumber}</span>
+            <Link
+              to={`/general-ledger/ledger?accountId=${row.original.id}`}
+              className="font-medium hover:underline hover:text-primary transition-colors text-foreground font-mono"
+            >
+              {row.original.accountNumber}
+            </Link>
           </div>
         ),
       },

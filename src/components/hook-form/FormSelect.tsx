@@ -15,6 +15,7 @@ interface FormSelectProps {
   options: { label: string; value: string }[];
   placeholder?: string;
   className?: string;
+  disabled?: boolean;
 }
 
 export const FormSelect = ({
@@ -23,6 +24,7 @@ export const FormSelect = ({
   options,
   placeholder = "Select an option",
   className,
+  disabled,
 }: FormSelectProps) => {
   const { control } = useFormContext();
 
@@ -40,7 +42,7 @@ export const FormSelect = ({
               {label}
             </Label>
           )}
-          <Select onValueChange={field.onChange} value={field.value ?? undefined}>
+          <Select onValueChange={field.onChange} value={field.value ?? undefined} disabled={disabled}>
             <SelectTrigger
               id={name}
               className={cn(
