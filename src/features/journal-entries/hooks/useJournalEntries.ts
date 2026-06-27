@@ -49,6 +49,16 @@ export function useDeleteJournalVoucher() {
   });
 }
 
+export function useCopyJournalVoucher() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => journalEntriesApi.copy(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: JOURNAL_ENTRIES_KEYS.lists() });
+    },
+  });
+}
+
 export function useValidateJournalVoucher() {
   return useMutation({
     mutationFn: (voucher: JournalVoucherDto) => journalEntriesApi.validate(voucher),

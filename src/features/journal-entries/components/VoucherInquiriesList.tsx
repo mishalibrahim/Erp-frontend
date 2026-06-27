@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { Eye, Trash2 } from "lucide-react";
+import { Eye, Trash2, Copy } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 
-import { useGetJournalEntries, useDeleteJournalVoucher } from "../hooks/useJournalEntries";
+import { useGetJournalEntries, useDeleteJournalVoucher, useCopyJournalVoucher } from "../hooks/useJournalEntries";
 import type { JournalVoucherDto } from "../types";
 import { formatAmount } from "../../general-ledger/utils/glCalculations";
 
@@ -21,6 +21,7 @@ interface VoucherInquiriesListProps {
 export function VoucherInquiriesList({ onViewVoucher }: VoucherInquiriesListProps) {
   const { data: vouchers = [], isLoading } = useGetJournalEntries();
   const deleteMutation = useDeleteJournalVoucher();
+  const copyMutation = useCopyJournalVoucher();
 
   // Filters State
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -35,6 +36,16 @@ export function VoucherInquiriesList({ onViewVoucher }: VoucherInquiriesListProp
     e.stopPropagation();
     setVoucherToDelete(id);
     setDeleteConfirmOpen(true);
+  };
+
+  const handleCopyClick = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await copyMutation.mutateAsync(id);
+      toast.success("Voucher copied as new Draft!");
+    } catch {
+      toast.error("Failed to copy voucher.");
+    }
   };
 
   const confirmDelete = async () => {
@@ -189,6 +200,16 @@ export function VoucherInquiriesList({ onViewVoucher }: VoucherInquiriesListProp
             >
               <Eye className="h-4 w-4" />
             </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-blue-400 hover:bg-blue-500/10"
+              onClick={(e) => handleCopyClick(row.original.id, e)}
+              title="Copy Voucher as new Draft"
+              disabled={copyMutation.isPending}
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
             {(row.original.status === "Draft" || row.original.status === "Rejected") && (
               <Button
                 variant="ghost"
@@ -205,7 +226,7 @@ export function VoucherInquiriesList({ onViewVoucher }: VoucherInquiriesListProp
         ),
       },
     ],
-    [deleteMutation.isPending]
+    [deleteMutation.isPending, copyMutation.isPending]
   );
 
   return (

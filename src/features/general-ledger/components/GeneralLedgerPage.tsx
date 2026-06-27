@@ -13,6 +13,8 @@ import { GlActionPanel } from "./GlActionPanel";
 import { GlFilterToolbar } from "./GlFilterToolbar";
 import { GlLedgerTable } from "./GlLedgerTable";
 import { GlSummaryFooter } from "./GlSummaryFooter";
+import { TrialBalancePage } from "./TrialBalancePage";
+import { PeriodLockPage } from "./PeriodLockPage";
 
 // Hooks & Types
 import {
@@ -206,27 +208,11 @@ export function GeneralLedgerPage() {
         </TabsContent>
 
         <TabsContent value="drill-down" className="outline-none">
-          <div className="bg-card border rounded-xl p-8 text-center space-y-4 shadow-sm max-w-xl mx-auto mt-8">
-            <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-              <Info className="h-6 w-6 text-primary" />
-            </div>
-            <h2 className="text-xl font-bold">Drill-down Analytics Dashboard</h2>
-            <p className="text-muted-foreground text-sm leading-relaxed">
-              Coming soon in v1.1. This tab will support interactive transaction path tracing, multi-ledger comparisons, and account correlation visualization.
-            </p>
-          </div>
+          <PeriodLockPage />
         </TabsContent>
 
         <TabsContent value="reports" className="outline-none">
-          <div className="bg-card border rounded-xl p-8 text-center space-y-4 shadow-sm max-w-xl mx-auto mt-8">
-            <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-              <Info className="h-6 w-6 text-primary" />
-            </div>
-            <h2 className="text-xl font-bold">Financial Reports Generator</h2>
-            <p className="text-muted-foreground text-sm leading-relaxed">
-              Coming soon in v1.1. Generating audited trial balances, profit & loss, balance sheets, and cash flow statements directly from general ledger queries.
-            </p>
-          </div>
+          <TrialBalancePage />
         </TabsContent>
       </div>
     </Tabs>

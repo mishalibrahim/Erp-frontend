@@ -42,6 +42,13 @@ export const journalEntriesApi = {
     await axiosClient.delete(`${API_ENDPOINTS.JOURNAL_ENTRIES.GET_ALL}/${id}`);
   },
 
+  copy: async (id: string): Promise<JournalVoucherDto> => {
+    const { data } = await axiosClient.post<JournalVoucherDto>(
+      `${API_ENDPOINTS.JOURNAL_ENTRIES.GET_ALL}/${id}/copy`
+    );
+    return data;
+  },
+
   validate: async (
     voucher: JournalVoucherDto
   ): Promise<{ success: boolean; errors: string[] }> => {
