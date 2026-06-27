@@ -67,11 +67,15 @@ const navGroups: NavGroup[] = [
         items: [
           {
             title: "Chart of Accounts",
-            url: "general-ledger/chart-of-accounts",
+            url: "/general-ledger/chart-of-accounts",
           },
           {
             title: "Journal Voucher",
             url: "/general-ledger/journal-entries",
+          },
+          {
+            title: "General Ledger",
+            url: "/general-ledger/ledger",
           },
         ],
       },

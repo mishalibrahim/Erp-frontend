@@ -40,4 +40,10 @@ export const API_ENDPOINTS = {
     CREATE: "/api/journal-entries",
     POST_DRAFT: (id: string) => `/api/journal-entries/${id}/post`,
   },
+  GENERAL_LEDGER: {
+    TRANSACTIONS: "/api/general-ledger/transactions",
+    OPENING_BALANCE: "/api/general-ledger/opening-balance",
+    COST_CENTERS: "/api/general-ledger/cost-centers",
+    PERIODS: "/api/general-ledger/periods",
+  },
 } as const;
